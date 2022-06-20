@@ -17,10 +17,7 @@ import java.util.Map;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class UserPrincipal implements  UserDetails {
-    private final String userId;
-    private final String password;
-    private final ProviderType providerType;
-    private final RoleType roleType;
+    private final User user;
     private final Collection<GrantedAuthority> authorities;
     private Map<String, Object> attributes;
 
@@ -34,10 +31,15 @@ public class UserPrincipal implements  UserDetails {
         return authorities;
     }
 
+    @Override
+    public String getPassword() {
+        return user.getPassword();
+    }
+
 
     @Override
     public String getUsername() {
-        return userId;
+        return this.getUser().getUserId().toString();
     }
 
     @Override
@@ -65,10 +67,7 @@ public class UserPrincipal implements  UserDetails {
 
     public static UserPrincipal create(User user) {
         return new UserPrincipal(
-                user.getUserId().toString(),
-                user.getPassword(),
-                user.getProviderType(),
-                user.getRole(),
+                user,
                 Collections.singletonList(new SimpleGrantedAuthority(user.getRole().getCode()))
         );
     }

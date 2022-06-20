@@ -101,6 +101,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     /*
      * 쿠키 기반 인가 Repository
+     *
      * 인가 응답을 연계 하고 검증할 때 사용.
      * */
 

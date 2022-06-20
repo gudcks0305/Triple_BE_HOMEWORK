@@ -30,4 +30,9 @@ public class UserService {
         userRepository.save(newUser);
     }
 
+    public User findByUserId(String userId) {
+        return userRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다.")
+        );
+    }
 }
