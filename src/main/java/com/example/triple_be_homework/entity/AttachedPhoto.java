@@ -2,6 +2,7 @@ package com.example.triple_be_homework.entity;
 
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.stereotype.Indexed;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -12,19 +13,20 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Table(indexes = {
+        @Index(name = "idx_attachedPhoto_id", columnList = "attachedPhotoId")})
 public class AttachedPhoto extends BaseTimeEntity{
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(columnDefinition = "BINARY(16)")
     private UUID attachedPhotoId;
-    private String fileName;
-    private String filePath;
-
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "review_review_id")
-    private Review review;
-
+    @JoinColumn(name = "review_id")
+    private Review reviewId;
+    public String covertToString() {
+        return this.attachedPhotoId.toString();
+    }
 
 }

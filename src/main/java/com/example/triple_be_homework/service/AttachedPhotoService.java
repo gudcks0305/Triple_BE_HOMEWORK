@@ -19,30 +19,13 @@ import java.util.stream.Collectors;
 public class AttachedPhotoService {
     private final PhotoRepository photoRepository;
 
-    public List<AttachedPhoto> saveAll(List<MultipartFile> attachedPhotoIds) throws IOException {
-        String basePath = "upload-files/";
-        if(!(new File(basePath)).exists()) {
-            (new File(basePath)).mkdir();
-        }
-        List<AttachedPhoto> attachedPhotos = attachedPhotoIds.stream()
-                .map(attachedPhotoId -> {
-                    String fileName = UUID.randomUUID().toString();
-                    String filePath = basePath + fileName;
-                    File file = new File(filePath);
-                    try {
-                        attachedPhotoId.transferTo(file);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    return AttachedPhoto.builder()
-                            .fileName(fileName)
-                            .filePath(filePath)
-                            .build();
-                    }).collect(Collectors.toList());
-
-
-        photoRepository.saveAll(attachedPhotos);
-        return attachedPhotos;
+    public List<AttachedPhoto> saveAll(List<String> attachedPhotoIds)  {
+         List <AttachedPhoto> attachedPhotos = attachedPhotoIds.stream().map(id -> {
+             AttachedPhoto attachedPhoto = new AttachedPhoto();
+             attachedPhoto.setAttachedPhotoId(UUID.fromString(id));
+             return attachedPhoto;
+         }).collect(Collectors.toList());
+            return photoRepository.saveAll(attachedPhotos);
 
     }
 

@@ -1,36 +1,29 @@
 package com.example.triple_be_homework.entity;
 
-import com.example.triple_be_homework.auth.entity.ProviderType;
-import com.example.triple_be_homework.auth.entity.RoleType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.UUID;
 
-@Data
+@Setter
+@Getter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Table(indexes = {
+        @Index(name = "idx_user_id", columnList = "userId")})
 public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(columnDefinition = "BINARY(16)")
     private UUID userId;
-    @Column(nullable = false , unique = true)
-    private String email;
-    private String password;
-    // ENUM
-    private RoleType role;
-    // ENUM
-    private ProviderType providerType;
+
+    public String covertToString() {
+        return this.userId.toString();
+    }
 
 }
