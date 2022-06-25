@@ -21,11 +21,11 @@ import java.util.stream.Collectors;
 public class PointCalculateService {
 
     private static final String CAL_POINT_COMPLETE_WHEN_ADD_REVIEW
-            = "[PointCalculateService - addReviewPoint] 리뷰 생성에 따른 포인트 이력 정산 완료";
+            = "[addReviewPoint] 리뷰 생성에 따른 포인트 이력 정산 완료";
     private static final String CAL_POINT_COMPLETE_WHEN_MOD_REVIEW
-            = "[PointCalculateService - modifyReviewPoint] 리뷰 수정에 따른 포인트 이력 정산 완료";
+            = "[modifyReviewPoint] 리뷰 수정에 따른 포인트 이력 정산 완료";
     private static final String CAL_POINT_COMPLETE_WHEN_DELETE_REVIEW
-            = "[PointCalculateService - deleteReviewPoint] 리뷰 삭제에 따른 포인트 이력 정산 완료";
+            = "[deleteReviewPoint] 리뷰 삭제에 따른 포인트 이력 정산 완료";
 
     private final PointHistoryRepository pointHistoryRepository;
 

@@ -1,5 +1,6 @@
 package com.example.triple_be_homework.common.dto;
 
+import com.example.triple_be_homework.point.dto.PointTotalResponseDto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -47,4 +48,6 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> notExpiredTokenYet() {
         return new ApiResponse(new ApiResponseHeader(FAILED, NOT_EXPIRED_TOKEN_YET), null);
     }
+
+
 }

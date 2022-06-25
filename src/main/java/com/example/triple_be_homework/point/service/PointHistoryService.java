@@ -1,11 +1,13 @@
 package com.example.triple_be_homework.point.service;
 
 import com.example.triple_be_homework.event.dto.EventKafka;
+import com.example.triple_be_homework.point.dto.PointHistoryResponseDto;
 import com.example.triple_be_homework.point.entity.PlaceReviewCount;
 import com.example.triple_be_homework.point.entity.PointHistory;
 import com.example.triple_be_homework.point.entity.PointRemain;
 import com.example.triple_be_homework.point.entity.PointType;
 import com.example.triple_be_homework.point.repository.PlaceReviewCountRepository;
+import com.example.triple_be_homework.point.repository.PointHistoryRepository;
 import com.example.triple_be_homework.point.repository.PointRemainRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +23,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class PointHistoryService {
-
+    private final PointHistoryRepository pointHistoryRepository;
     private final PlaceReviewCountRepository placeReviewCountRepository;
 
     private final PointRemainRepository pointRemainRepository;
@@ -60,7 +62,7 @@ public class PointHistoryService {
                                     .builder().reviewCount(0)
                                     .placeId(placeId)
                                     .build();
-                            placeReviewCountRepository.save(reviewCount);
+                            placeReviewCountRepository.saveAndFlush(reviewCount);
                             return reviewCount;
                         }
                 );
@@ -141,5 +143,20 @@ public class PointHistoryService {
         placeReviewCount.minusReviewCount();
 
         return pointHistoriesTobeSaved;
+    }
+    @Transactional
+    public List<PointHistoryResponseDto> findPointHistory(UUID fromString) {
+        List<PointHistoryResponseDto> pointHistoryResponseDtoList = new ArrayList<>();
+        List<PointHistory> pointHistoryList = pointHistoryRepository.findAllByUserId(fromString);
+        pointHistoryList.forEach(pointHistory -> {
+            PointHistoryResponseDto pointHistoryResponseDto = PointHistoryResponseDto.builder()
+                            .point(pointHistory.getPoint())
+                            .pointType(pointHistory.getPointType())
+                            .placeId(pointHistory.getPlaceId())
+                            .build();
+
+            pointHistoryResponseDtoList.add(pointHistoryResponseDto);
+        });
+        return pointHistoryResponseDtoList;
     }
 }

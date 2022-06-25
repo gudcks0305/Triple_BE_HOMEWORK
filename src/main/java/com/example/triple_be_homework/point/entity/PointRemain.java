@@ -15,7 +15,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(indexes = {
+@Table( name = "point_remain" ,
+        indexes = {
         @Index(name = "idx_user_id", columnList = "userId"),})
 public class PointRemain extends BaseTimeEntity {
     @Id

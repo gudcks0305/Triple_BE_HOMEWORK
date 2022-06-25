@@ -18,11 +18,6 @@ public class EventController {
 
     @PostMapping("/events")
     public ApiResponse event(@RequestBody EventRequestDto eventDto) {
-        log.info("eventDto: {}", eventDto.getContent());
-        log.info("eventDto: {}", eventDto.getAttachedPhotoIds());
-        log.info(eventDto.getPlaceId());
-        log.info(eventDto.getUserId());
-        log.info(eventDto.getAction().name());
 
 
         eventService.publishPointEvent(eventDto);
