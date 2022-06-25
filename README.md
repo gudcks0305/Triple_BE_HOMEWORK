@@ -1,7 +1,7 @@
-<<<<<<< Updated upstream
+
 # Triple_BE_HOMEWORK
  트리플 BE 과제 입니다. 
-=======
+
 # Triple HomeWork
 ### 트리플여행자 마일리지 서비스 과제
 
@@ -32,7 +32,9 @@
 }
 ```
 Place는 본래 저장이 되어있어야 API 처리가 성공적으로 가능 하지만 
+
 테스트 편의 상 저장이 되어있지 않는 Place의 경우 요청 PlaceId로 reviewCount 정보를 만들어 주었습니다. 
+
 
 ##### GET /point/history/{userId} 
 Response:
@@ -147,6 +149,7 @@ CREATE INDEX idx_user_id ON point_remain (user_id);
 #### `문제점은 다음과 같습니다. `
 #### `비동기를 위해 Kafka를 이용하였는데 이럴 경우 consumer에게 일을 던져주고 return을 해 버리기 때문에 Client에서는 오류를 확인하기 어렵습니다.  `
 #### `이러한 점은 로직에 문제가 없다는 가정하에  Kafka 는 중단 부분부터 재시작이 가능 합니다. `
+
 #### `서버에 문제가 있더라도 서버가 재시작 되면서 이전에 요청한 작업의 경우는 Message que에 저장되기 때문에 작업의 신뢰성을 보장 할 수 있어서 크게 문제가없다고 생각 했습니다.`
 
 
@@ -155,5 +158,3 @@ CREATE INDEX idx_user_id ON point_remain (user_id);
 
 
 
-
->>>>>>> Stashed changes
