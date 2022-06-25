@@ -19,17 +19,16 @@ public class EventRequestDto {
     private List<String> attachedPhotoIds;
 
     public EventKafka toEntity() {
-         EventKafka eventKafka = EventKafka.builder()
-                 .userId(UUID.fromString(userId))
-                 .placeId(UUID.fromString(placeId))
-                 .action(action)
-                 .photosCount(attachedPhotoIds.size())
-                .type(type)
-                 .reviewId(UUID.fromString(reviewId))
-                 .contentLength(content.length())
-                .build();
 
 
-        return eventKafka;
+        return EventKafka.builder()
+                .userId(UUID.fromString(userId))
+                .placeId(UUID.fromString(placeId))
+                .action(action)
+                .photosCount(attachedPhotoIds.size())
+               .type(type)
+                .reviewId(UUID.fromString(reviewId))
+                .contentLength(content.length())
+               .build();
     }
 }

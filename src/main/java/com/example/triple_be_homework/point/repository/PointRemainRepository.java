@@ -15,7 +15,7 @@ public interface PointRemainRepository extends JpaRepository<PointRemain, Long> 
 
     Optional<PointRemain> findByUserIdAndPlaceIdAndPointType(UUID userId, UUID placeId, PointType pointType);
 
-    @Query(value = "SELECT IFNULL(sum(point), 0) FROM point_remain WHERE user_id = :userId", nativeQuery = true)
+    @Query(value = "SELECT IFNULL(sum(point), 0) FROM pointRemain WHERE user_id = :userId", nativeQuery = true)
     Integer sumPointByUserId(UUID userId);
 
 }

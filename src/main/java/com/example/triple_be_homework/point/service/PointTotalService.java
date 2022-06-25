@@ -17,12 +17,6 @@ public class PointTotalService {
 
     private final PointRemainRepository pointRemainRepository;
 
-    /**
-     * 특정 사용자의 유효 포인트 총점 조회<br>
-     * redis에 cache가 없는 경우 DB 조회 후 redis에 저장
-     * @param userId 조회하는 특정 사용자의 ID
-     * @return 유효포인트 총점
-     */
     @Transactional(readOnly = true)
     public PointTotalResponseDto findTotalPoint(UUID userId) {
 

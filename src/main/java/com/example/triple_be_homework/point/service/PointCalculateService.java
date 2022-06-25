@@ -33,14 +33,8 @@ public class PointCalculateService {
 
     private final PointHistoryService pointHistoryService;
 
-    private final PointTotalService pointTotalService;
 
-    /**
-     * 특정 Place에 대한 신규 리뷰 작성
-     * @param userId 작성한 사용자 ID
-     * @param placeId 작성한 리뷰의 Place ID
-     * @param pointEvent 리뷰 작성에 대한 포인트 정산을 위한 내용
-     */
+
     @Transactional
     public void addReviewPoint(UUID userId, UUID placeId, EventKafka pointEvent) {
 
@@ -60,12 +54,7 @@ public class PointCalculateService {
         log.info(CAL_POINT_COMPLETE_WHEN_ADD_REVIEW);
     }
 
-    /**
-     * 특정 Place에 대한 리뷰 수정
-     * @param userId 수정한 사용자 ID
-     * @param placeId 수정한 리뷰의 Place ID
-     * @param pointEvent 리뷰 수정에 대한 내용 (photosCount가 중요)
-     */
+
     @Transactional
     public void modifyReviewPoint(UUID userId, UUID placeId, EventKafka pointEvent) {
 
@@ -85,11 +74,7 @@ public class PointCalculateService {
         log.info(CAL_POINT_COMPLETE_WHEN_MOD_REVIEW);
     }
 
-    /**
-     * 특정 Place에 대한 리뷰 삭제
-     * @param userId 삭제한 사용자 ID
-     * @param placeId 삭제한 리뷰의 Place Id
-     */
+
     @Transactional
     public void deleteReviewPoint(UUID userId, UUID placeId) {
 
@@ -109,9 +94,7 @@ public class PointCalculateService {
         log.info(CAL_POINT_COMPLETE_WHEN_DELETE_REVIEW);
     }
 
-    /**
-     * point_history 데이터와 point_remain 데이터 저장
-     */
+
     private void saveAllPointHistoryAndRemainList(List<PointHistory> pointHistoryList) {
         // point_history 포인트 이력 저장
         List<PointHistory> pointHistoriesSaved
@@ -121,9 +104,7 @@ public class PointCalculateService {
         pointRemainRepository.saveAll(convertToPointRemainList(pointHistoriesSaved));
     }
 
-    /**
-     * 저장된 PointHistory entity 리스트 기준으로 PointRemain entity 리스트 생성
-     */
+
     private List<PointRemain> convertToPointRemainList(List<PointHistory> pointHistoryList) {
         return pointHistoryList.stream()
                 .filter(pointHistory

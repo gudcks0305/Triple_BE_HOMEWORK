@@ -9,6 +9,7 @@ services:
     depends_on:
       - db-mysql
       - kafka
+      - zookeeper
     ports:
       - "8080:8080"
   db-mysql:

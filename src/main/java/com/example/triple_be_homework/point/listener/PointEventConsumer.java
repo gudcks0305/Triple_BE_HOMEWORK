@@ -19,8 +19,8 @@ public class PointEventConsumer {
 
     @KafkaListener(topics = "point_history", groupId = "point")
     public void consumerFromTopic(EventKafka pointEvent) {
-        log.info("Point calculate Review Action: " + pointEvent.getActionType());
-        ActionType action = pointEvent.getActionType();
+        log.info("Point calculate Review Action: " + pointEvent.getAction());
+        ActionType action = pointEvent.getAction();
 
         UUID userId = pointEvent.getUserId();
         UUID placeId = pointEvent.getPlaceId();

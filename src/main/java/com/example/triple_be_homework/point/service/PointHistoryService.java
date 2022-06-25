@@ -26,9 +26,6 @@ public class PointHistoryService {
 
     private final PointRemainRepository pointRemainRepository;
 
-    /**
-     * 포인트 부여 조건에 따른 PointHistory entity 생성
-     */
     @Transactional
     public List<PointHistory> createPointHistoryListWhenAddReview(UUID userId, UUID placeId, EventKafka pointEvent) {
         List<PointHistory> pointHistoriesTobeSaved = new ArrayList<>();
