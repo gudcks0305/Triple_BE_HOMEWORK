@@ -2,8 +2,6 @@
 # Triple_BE_HOMEWORK
  트리플 BE 과제 입니다. 
 
-# Triple HomeWork
-### 트리플여행자 마일리지 서비스 과제
 
 #### Stack
 - Java 11
@@ -33,7 +31,8 @@
 ```
 Place는 본래 저장이 되어있어야 API 처리가 성공적으로 가능 하지만 
 
-테스트 편의 상 저장이 되어있지 않는 Place의 경우 요청 PlaceId로 reviewCount 정보를 만들어 주었습니다. 
+테스트 편의 상 저장이 되어있지 않는 Place의 경우 요청 PlaceId로 reviewCount 정보를 만들어 주었습니다. (Null Error Block)
+
 
 
 ##### GET /point/history/{userId} 
@@ -139,10 +138,10 @@ CREATE INDEX idx_user_id ON point_remain (user_id);
 ```
 ## 🏝 요구사항 분석
 ### 1. 문제 분석
-고민을 많이 했습니다. Review Event API 를 보니 Delete Event API
-와 같은 경우 이미 삭제가 된 리뷰의 대한 정보에 대해 event 가 발생 한다는게 가장 큰 고민이였습니다.
+####  Review Event API 를 보니 Delete Event API 와 같은 경우 이미 삭제가 된 리뷰의 대한 정보에 대해 event 가 발생 한다는게 가장 큰 고민이였습니다.
 ###### 포인트 HISTORY 를 만들기 위해서 INSERT 만 존재하는 테이블을 만들어야 했고
-###### 이러한 문제를 해결하기 위해서 현재 남아있는 기록과 전체 기록을 비교 하는 방법을 떠올렸습니다.
+###### 이러한 문제를 해결하기 위해서 현재 유효하게 남아있는 포인트 기록 테이블과 전체 포인트  기록 테이블을 만들어 주었습니다.
+
 
 ## 🏝 구현 프로그램의 문제점
 ###### 대규모 서비스에서 비동기는 필수적이라 생각하여 비동기로 구현했습니다.
