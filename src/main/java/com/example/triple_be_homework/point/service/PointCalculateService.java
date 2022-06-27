@@ -38,17 +38,16 @@ public class PointCalculateService {
     @Transactional
     public void addReviewPoint(UUID userId, UUID placeId, EventKafka pointEvent) {
 
-        // 1. point_remain 내 기존 유효한 포인트 존재 여부 체크
+        // 1.내 기존 유효한 포인트 존재 여부 체크
         List<PointRemain> pointRemainList = pointRemainRepository.findAllByUserIdAndPlaceId(userId, placeId);
         if (!pointRemainList.isEmpty())
             throw new IllegalArgumentException(userId + "는 이미 " + placeId + "에 리뷰를 남겼습니다." );
 
-        // 2. point_history 포인트 이력 저장 & point_remain 유효한 포인트 데이터 저장
+        // 2.포인트 이력 저장 & point_remain 유효한 포인트 데이터 저장
         List<PointHistory> pointHistoryList
                 = pointHistoryService.createPointHistoryListWhenAddReview(userId, placeId, pointEvent);
         saveAllPointHistoryAndRemainList(pointHistoryList);
 
-        // 3. 갱신된 사용자 유효 포인트 총점 조회
 
 
         log.info(CAL_POINT_COMPLETE_WHEN_ADD_REVIEW);
@@ -58,18 +57,15 @@ public class PointCalculateService {
     @Transactional
     public void modifyReviewPoint(UUID userId, UUID placeId, EventKafka pointEvent) {
 
-        // 1. point_remain 내 기존 유효한 포인트 존재 여부 체크
+        // 1.  내 기존 유효한 포인트 존재 여부 체크
         List<PointRemain> pointRemainList = pointRemainRepository.findAllByUserIdAndPlaceId(userId, placeId);
         if (pointRemainList.isEmpty())
             throw new RuntimeException(userId + "는 " + placeId + "에 리뷰 기록이 없습니다." );
 
-        // 2. point_history 포인트 이력 저장 & point_remain 유효한 포인트 데이터 저장
+        // 2.포인트 이력 저장 & point_remain 유효한 포인트 데이터 저장
         List<PointHistory> pointHistoryList
                 = pointHistoryService.createPointHistoryListWhenModifyReview(userId, placeId, pointEvent);
         saveAllPointHistoryAndRemainList(pointHistoryList);
-
-        // 3. 갱신된 사용자 유효 포인트 총점 조회 및 DB 저장
-
 
         log.info(CAL_POINT_COMPLETE_WHEN_MOD_REVIEW);
     }
@@ -78,17 +74,16 @@ public class PointCalculateService {
     @Transactional
     public void deleteReviewPoint(UUID userId, UUID placeId) {
 
-        // 1. point_remain 내 기존 유효한 포인트 존재 여부 체크
+        // 1. 내 기존 유효한 포인트 존재 여부 체크
         List<PointRemain> pointRemainList = pointRemainRepository.findAllByUserIdAndPlaceId(userId, placeId);
         if (pointRemainList.isEmpty())
             throw new RuntimeException(userId + "는 " + placeId + "에 리뷰 기록이 없습니다." );
 
-        // 2. point_history 포인트 이력 저장 & point_remain 유효한 포인트 데이터 저장
+        // 2. 포인트 이력 저장 & point_remain 유효한 포인트 데이터 저장
         List<PointHistory> pointHistoryList
                 = pointHistoryService.createPointHistoryListWhenDeleteReview(userId, placeId, pointRemainList);
         saveAllPointHistoryAndRemainList(pointHistoryList);
 
-        // 3. 갱신된 사용자 유효 포인트 총점 조회 및 DB 저장
 
 
         log.info(CAL_POINT_COMPLETE_WHEN_DELETE_REVIEW);

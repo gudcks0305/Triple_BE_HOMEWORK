@@ -22,7 +22,7 @@ public class EventController {
 
         eventService.publishPointEvent(eventDto);
         return ApiResponse.success("message"
-                , eventDto.getReviewId() + "이벤트 처리 완료 , 처리 action : " + eventDto.getAction());
+                , eventDto.getReviewId() + " 이벤트 처리 완료 , 처리 action : " + eventDto.getAction());
     }
 
 }

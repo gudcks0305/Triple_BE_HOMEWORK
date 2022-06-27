@@ -15,7 +15,6 @@ public class PointEventProducer {
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public void send(EventKafka event) {
-        org.springframework.kafka.support.serializer.JsonDeserializer jsonDeserializer = new org.springframework.kafka.support.serializer.JsonDeserializer();
         log.info("kafka message: " + event);
         kafkaTemplate.send(TOPIC, event);
     }
