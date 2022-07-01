@@ -19,12 +19,7 @@ public class PointTotalService {
 
     @Transactional(readOnly = true)
     public PointTotalResponseDto findTotalPoint(UUID userId) {
-
         Integer currentUserPoint = pointRemainRepository.sumPointByUserId(userId);
-
         return PointTotalResponseDto.builder().totalRemainPoint(currentUserPoint).build();
     }
-
-
-
 }

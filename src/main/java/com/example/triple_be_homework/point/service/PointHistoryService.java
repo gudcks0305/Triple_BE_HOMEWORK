@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -25,7 +26,6 @@ import java.util.UUID;
 public class PointHistoryService {
     private final PointHistoryRepository pointHistoryRepository;
     private final PlaceReviewCountRepository placeReviewCountRepository;
-
     private final PointRemainRepository pointRemainRepository;
 
     @Transactional
@@ -126,7 +126,8 @@ public class PointHistoryService {
 
         log.info("삭제 대상 유효 total point: " + totalPointTobeDeleted);
 
-        pointHistoriesTobeSaved.add(PointHistory.builder()
+        pointHistoriesTobeSaved.add(
+                PointHistory.builder()
                 .point((byte) (totalPointTobeDeleted * -1))
                 .pointType(PointType.DEL_REVIEW)
                 .userId(userId)
@@ -144,19 +145,34 @@ public class PointHistoryService {
 
         return pointHistoriesTobeSaved;
     }
-    @Transactional
+    @Transactional(readOnly = true)
     public List<PointHistoryResponseDto> findPointHistory(UUID fromString) {
         List<PointHistoryResponseDto> pointHistoryResponseDtoList = new ArrayList<>();
         List<PointHistory> pointHistoryList = pointHistoryRepository.findAllByUserId(fromString);
         pointHistoryList.forEach(pointHistory -> {
-            PointHistoryResponseDto pointHistoryResponseDto = PointHistoryResponseDto.builder()
-                            .point(pointHistory.getPoint())
-                            .pointType(pointHistory.getPointType())
-                            .placeId(pointHistory.getPlaceId())
-                            .build();
-
+            PointHistoryResponseDto pointHistoryResponseDto = PointHistoryResponseDto.of(pointHistory);
             pointHistoryResponseDtoList.add(pointHistoryResponseDto);
         });
         return pointHistoryResponseDtoList;
+    }
+
+
+    public void saveAllPointHistoryAndRemainList(List<PointHistory> pointHistoryList) {
+        // point_history 포인트 이력 저장
+        List<PointHistory> pointHistoriesSaved
+                = pointHistoryRepository.saveAll(pointHistoryList);
+
+        // point_remain 유효한 포인트 데이터 저장
+        pointRemainRepository.saveAll(convertToPointRemainList(pointHistoriesSaved));
+    }
+
+
+    public List<PointRemain> convertToPointRemainList(List<PointHistory> pointHistoryList) {
+        return pointHistoryList.stream()
+                .filter(pointHistory
+                        -> (pointHistory.getPointType() != PointType.DEL_ALL_PHOTO)
+                        && (pointHistory.getPointType() != PointType.DEL_REVIEW))
+                .map(PointHistory::toPointRemainEntity)
+                .collect(Collectors.toList());
     }
 }
