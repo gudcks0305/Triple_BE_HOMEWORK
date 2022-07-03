@@ -1,6 +1,7 @@
 package com.example.triple_be_homework.point.service;
 
 import com.example.triple_be_homework.event.dto.EventKafka;
+import com.example.triple_be_homework.point.dto.PointHistoryResponseDto;
 import com.example.triple_be_homework.point.entity.PointHistory;
 import com.example.triple_be_homework.point.entity.PointRemain;
 import com.example.triple_be_homework.point.entity.PointType;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -97,6 +99,15 @@ public class PointHistoryService {
                 .map(PointHistory::toPointRemainEntity)
                 .collect(Collectors.toList());
     }
-
+    @Transactional(readOnly = true)
+    public List<PointHistoryResponseDto> findPointHistory(UUID fromString) {
+        List<PointHistoryResponseDto> pointHistoryResponseDtoList = new ArrayList<>();
+        List<PointHistory> pointHistoryList = pointHistoryRepository.findAllByUserId(fromString);
+        pointHistoryList.forEach(pointHistory -> {
+            PointHistoryResponseDto pointHistoryResponseDto = PointHistoryResponseDto.of(pointHistory);
+            pointHistoryResponseDtoList.add(pointHistoryResponseDto);
+        });
+        return pointHistoryResponseDtoList;
+    }
 
 }
