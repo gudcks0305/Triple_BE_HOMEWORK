@@ -23,7 +23,6 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class PointCirculateService {
-    private final PointHistoryRepository pointHistoryRepository;
     private final PlaceReviewCountRepository placeReviewCountRepository;
     private final PointRemainRepository pointRemainRepository;
 

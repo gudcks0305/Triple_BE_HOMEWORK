@@ -1,7 +1,6 @@
 package com.example.triple_be_homework.point.controller;
 
 import com.example.triple_be_homework.common.dto.ApiResponse;
-import com.example.triple_be_homework.point.service.PointCirculateService;
 import com.example.triple_be_homework.point.service.PointHistoryService;
 import com.example.triple_be_homework.point.service.PointTotalService;
 import lombok.RequiredArgsConstructor;
