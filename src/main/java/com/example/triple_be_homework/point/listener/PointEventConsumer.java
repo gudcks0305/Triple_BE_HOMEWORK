@@ -26,10 +26,10 @@ public class PointEventConsumer {
         UUID placeId = pointEvent.getPlaceId();
 
         switch (action) {
-            case ADD -> pointHistoryService.addReviewPoint(userId, placeId, pointEvent);
-            case MOD -> pointHistoryService.modifyReviewPoint(userId, placeId, pointEvent);
-            case DELETE -> pointHistoryService.deleteReviewPoint(userId, placeId);
-            default -> throw new RuntimeException("Action Not Found Exception");
+            case ADD : pointHistoryService.addReviewPoint(userId, placeId, pointEvent); break;
+            case MOD : pointHistoryService.modifyReviewPoint(userId, placeId, pointEvent); break;
+            case DELETE : pointHistoryService.deleteReviewPoint(userId, placeId); break;
+            default : throw new RuntimeException("Action Not Found Exception");
         }
     }
 }
