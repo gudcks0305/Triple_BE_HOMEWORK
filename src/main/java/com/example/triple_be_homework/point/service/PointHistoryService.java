@@ -1,9 +1,12 @@
 package com.example.triple_be_homework.point.service;
 
 import com.example.triple_be_homework.event.dto.EventKafka;
+import com.example.triple_be_homework.point.dto.PointHistoryResponseDto;
+import com.example.triple_be_homework.point.entity.PlaceReviewCount;
 import com.example.triple_be_homework.point.entity.PointHistory;
 import com.example.triple_be_homework.point.entity.PointRemain;
 import com.example.triple_be_homework.point.entity.PointType;
+import com.example.triple_be_homework.point.repository.PlaceReviewCountRepository;
 import com.example.triple_be_homework.point.repository.PointHistoryRepository;
 import com.example.triple_be_homework.point.repository.PointRemainRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -19,67 +24,140 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class PointHistoryService {
-
-    private static final String CAL_POINT_COMPLETE_WHEN_ADD_REVIEW
-            = "[addReviewPoint] 리뷰 생성에 따른 포인트 이력 정산 완료";
-    private static final String CAL_POINT_COMPLETE_WHEN_MOD_REVIEW
-            = "[modifyReviewPoint] 리뷰 수정에 따른 포인트 이력 정산 완료";
-    private static final String CAL_POINT_COMPLETE_WHEN_DELETE_REVIEW
-            = "[deleteReviewPoint] 리뷰 삭제에 따른 포인트 이력 정산 완료";
-
-    private final PointRemainRepository pointRemainRepository;
     private final PointHistoryRepository pointHistoryRepository;
-    private final PointCirculateService pointCirculateService;
-
-
-
-    @Transactional
-    public void addReviewPoint(UUID userId, UUID placeId, EventKafka pointEvent) {
-
-        // 1.내 기존 유효한 포인트 존재 여부 체크
-        checkPointRemain(userId, placeId);
-        // 2.포인트 이력 저장 & point_remain 유효한 포인트 데이터 저장
-        List<PointHistory> pointHistoryList
-                = pointCirculateService.createPointHistoryListWhenAddReview(userId, placeId, pointEvent);
-        saveAllPointHistoryAndRemainList(pointHistoryList);
-        log.info(CAL_POINT_COMPLETE_WHEN_ADD_REVIEW);
-    }
-
+    private final PlaceReviewCountRepository placeReviewCountRepository;
+    private final PointRemainRepository pointRemainRepository;
 
     @Transactional
-    public void modifyReviewPoint(UUID userId, UUID placeId, EventKafka pointEvent) {
-        // 1.  내 기존 유효한 포인트 존재 여부 체크
-        checkPointRemain(userId, placeId);
+    public List<PointHistory> createPointHistoryListWhenAddReview(UUID userId, UUID placeId, EventKafka pointEvent) {
+        List<PointHistory> pointHistoriesTobeSaved = new ArrayList<>();
+        LocalDateTime expiredDate = LocalDateTime.now().plusYears(1L);
 
-        // 2.포인트 이력 저장 & point_remain 유효한 포인트 데이터 저장
-        List<PointHistory> pointHistoryList
-                = pointCirculateService.createPointHistoryListWhenModifyReview(userId, placeId, pointEvent);
-        saveAllPointHistoryAndRemainList(pointHistoryList);
+        // 조건 1. content 1자 이상 텍스트 작성 (+1)
+        if (pointEvent.getContentLength() > 0)
+            pointHistoriesTobeSaved.add(PointHistory.builder()
+                    .point((byte) 1)
+                    .pointType(PointType.CONTENT)
+                    .expiredDate(expiredDate)
+                    .userId(userId)
+                    .placeId(placeId)
+                    .build());
 
-        log.info(CAL_POINT_COMPLETE_WHEN_MOD_REVIEW);
+        // 조건 2. photo 1장 이상 게시할 경우 (+1)
+        if (pointEvent.getPhotosCount() > 0)
+            pointHistoriesTobeSaved.add(PointHistory.builder()
+                    .point((byte) 1)
+                    .pointType(PointType.PHOTO)
+                    .expiredDate(expiredDate)
+                    .userId(userId)
+                    .placeId(placeId)
+                    .build());
+
+       // 해당 Place 가 없는 경우 save
+
+        PlaceReviewCount placeReviewCount = placeReviewCountRepository.findByPlaceId(placeId)
+                .orElseGet(
+                        () -> {
+                            PlaceReviewCount reviewCount = PlaceReviewCount
+                                    .builder().reviewCount(0)
+                                    .placeId(placeId)
+                                    .build();
+                            placeReviewCountRepository.saveAndFlush(reviewCount);
+                            return reviewCount;
+                        }
+                );
+                //.orElseThrow(() -> new PlaceReviewCountNotFoundException(placeId));
+        // 조건 3. 해당 장소에 대한 첫 리뷰글인 경우 (+1)
+        if (placeReviewCount.getReviewCount() == 0)
+            pointHistoriesTobeSaved.add(PointHistory.builder()
+                    .point((byte) 1)
+                    .pointType(PointType.FIRST)
+                    .expiredDate(expiredDate)
+                    .userId(userId)
+                    .placeId(placeId)
+                    .build());
+
+        placeReviewCount.addReviewCount();
+
+        return pointHistoriesTobeSaved;
     }
-
 
     @Transactional
-    public void deleteReviewPoint(UUID userId, UUID placeId) {
+    public List<PointHistory> createPointHistoryListWhenModifyReview(UUID userId, UUID placeId, EventKafka pointEvent) {
+        List<PointHistory> pointHistoriesTobeSaved = new ArrayList<>();
+        LocalDateTime expiredDate = LocalDateTime.now().plusYears(1L);
 
-        // 1. 내 기존 유효한 포인트 존재 여부 체크
-        List<PointRemain> pointRemainList = checkPointRemain(userId, placeId);
-        // 2. 포인트 이력 저장 & point_remain 유효한 포인트 데이터 저장
-        List<PointHistory> pointHistoryList
-                = pointCirculateService.createPointHistoryListWhenDeleteReview(userId, placeId, pointRemainList);
-        saveAllPointHistoryAndRemainList(pointHistoryList);
+        pointRemainRepository.findByUserIdAndPlaceIdAndPointType(userId, placeId, PointType.PHOTO)
+                .ifPresentOrElse(pointRemain -> {
+                    // 조건 1. 글과 사진이 있는 리뷰에 사진을 모두 삭제하는 경우 (-1)
+                    if (pointEvent.getPhotosCount() == 0) {
+                        pointHistoriesTobeSaved.add(PointHistory.builder()
+                                .point((byte) -1)
+                                .pointType(PointType.DEL_ALL_PHOTO)
+                                .expiredDate(expiredDate)
+                                .userId(userId)
+                                .placeId(placeId)
+                                .build());
 
-        log.info(CAL_POINT_COMPLETE_WHEN_DELETE_REVIEW);
+                        pointRemainRepository.delete(pointRemain);
+                    }
+                }, () -> {
+                    // 조건 2. 글만 작성한 리뷰에 사진을 게시한 경우 (+1)
+                    if (pointEvent.getPhotosCount() > 0) {
+                        pointHistoriesTobeSaved.add(PointHistory.builder()
+                                .point((byte) 1)
+                                .pointType(PointType.PHOTO)
+                                .expiredDate(expiredDate)
+                                .userId(userId)
+                                .placeId(placeId)
+                                .build());
+                    }
+                });
+
+        return pointHistoriesTobeSaved;
     }
 
-    private List<PointRemain> checkPointRemain(UUID userId, UUID placeId) {
-        List<PointRemain> pointRemainList = pointRemainRepository.findAllByUserIdAndPlaceId(userId, placeId);
-        if (pointRemainList.isEmpty())
-            throw new RuntimeException(userId + "는 " + placeId + "에 리뷰 기록이 없습니다." );
-        return pointRemainList;
+    @Transactional
+    public List<PointHistory> createPointHistoryListWhenDeleteReview(UUID userId, UUID placeId, List<PointRemain> pointRemainList) {
+        List<PointHistory> pointHistoriesTobeSaved = new ArrayList<>();
+
+        // 삭제할 리뷰에 해당하는 기존 유효 포인트 총점 계산
+        int totalPointTobeDeleted = pointRemainList.stream().mapToInt(PointRemain::getPoint).sum();
+
+        log.info("삭제 대상 유효 total point: " + totalPointTobeDeleted);
+
+        pointHistoriesTobeSaved.add(
+                PointHistory.builder()
+                .point((byte) (totalPointTobeDeleted * -1))
+                .pointType(PointType.DEL_REVIEW)
+                .userId(userId)
+                .placeId(placeId)
+                .build());
+
+        // point_remain 내 유효한 리뷰 포인트 모두 삭제
+        pointRemainRepository.deleteAll(pointRemainList);
+
+        // place_review_count 해당 장소에 대한 리뷰 카운트 -1
+        PlaceReviewCount placeReviewCount = placeReviewCountRepository.findByPlaceId(placeId)
+                .orElseThrow(() -> new IllegalArgumentException("Place Not Found error"));
+
+        placeReviewCount.minusReviewCount();
+
+        return pointHistoriesTobeSaved;
     }
-     private void saveAllPointHistoryAndRemainList(List<PointHistory> pointHistoryList) {
+    @Transactional(readOnly = true)
+    public List<PointHistoryResponseDto> findPointHistory(UUID fromString) {
+        List<PointHistoryResponseDto> pointHistoryResponseDtoList = new ArrayList<>();
+        List<PointHistory> pointHistoryList = pointHistoryRepository.findAllByUserId(fromString);
+        pointHistoryList.forEach(pointHistory -> {
+            PointHistoryResponseDto pointHistoryResponseDto = PointHistoryResponseDto.of(pointHistory);
+            pointHistoryResponseDtoList.add(pointHistoryResponseDto);
+        });
+        return pointHistoryResponseDtoList;
+    }
+
+
+    public void saveAllPointHistoryAndRemainList(List<PointHistory> pointHistoryList) {
         // point_history 포인트 이력 저장
         List<PointHistory> pointHistoriesSaved
                 = pointHistoryRepository.saveAll(pointHistoryList);
@@ -89,7 +167,7 @@ public class PointHistoryService {
     }
 
 
-    private List<PointRemain> convertToPointRemainList(List<PointHistory> pointHistoryList) {
+    public List<PointRemain> convertToPointRemainList(List<PointHistory> pointHistoryList) {
         return pointHistoryList.stream()
                 .filter(pointHistory
                         -> (pointHistory.getPointType() != PointType.DEL_ALL_PHOTO)
@@ -97,6 +175,4 @@ public class PointHistoryService {
                 .map(PointHistory::toPointRemainEntity)
                 .collect(Collectors.toList());
     }
-
-
 }

@@ -2,7 +2,7 @@ package com.example.triple_be_homework.point.listener;
 
 import com.example.triple_be_homework.event.dto.ActionType;
 import com.example.triple_be_homework.event.dto.EventKafka;
-import com.example.triple_be_homework.point.service.PointHistoryService;
+import com.example.triple_be_homework.point.service.PointCalculateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PointEventConsumer {
 
-    private final PointHistoryService pointHistoryService;
+    private final PointCalculateService pointCalculateService;
 
     @KafkaListener(topics = "point_history", groupId = "point")
     public void consumerFromTopic(EventKafka pointEvent) {
@@ -26,10 +26,17 @@ public class PointEventConsumer {
         UUID placeId = pointEvent.getPlaceId();
 
         switch (action) {
-            case ADD -> pointHistoryService.addReviewPoint(userId, placeId, pointEvent);
-            case MOD -> pointHistoryService.modifyReviewPoint(userId, placeId, pointEvent);
-            case DELETE -> pointHistoryService.deleteReviewPoint(userId, placeId);
-            default -> throw new RuntimeException("Action Not Found Exception");
+            case ADD:
+                pointCalculateService.addReviewPoint(userId, placeId, pointEvent);
+                break;
+            case MOD:
+                pointCalculateService.modifyReviewPoint(userId, placeId, pointEvent);
+                break;
+            case DELETE:
+                pointCalculateService.deleteReviewPoint(userId, placeId);
+                break;
+            default:
+                throw new RuntimeException("Action Not Found Exception");
         }
     }
 }
