@@ -39,7 +39,9 @@ public class PointHistoryService {
     public void addReviewPoint(UUID userId, UUID placeId, EventKafka pointEvent) {
 
         // 1.내 기존 유효한 포인트 존재 여부 체크
-        checkPointRemain(userId, placeId);
+        List<PointRemain> pointRemainList = pointRemainRepository.findAllByUserIdAndPlaceId(userId, placeId);
+        if (!pointRemainList.isEmpty())
+            throw new RuntimeException(userId + "는 " + placeId + "에 리뷰 기록이 있습니다." );
         // 2.포인트 이력 저장 & point_remain 유효한 포인트 데이터 저장
         List<PointHistory> pointHistoryList
                 = pointCirculateService.createPointHistoryListWhenAddReview(userId, placeId, pointEvent);
