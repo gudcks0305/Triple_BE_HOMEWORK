@@ -15,11 +15,5 @@ public class PointHistoryResponseDto {
     private PointType pointType;
     private UUID placeId;
 
-    public static PointHistoryResponseDto of(PointHistory pointHistory) {
-        return PointHistoryResponseDto.builder()
-                .point(pointHistory.getPoint())
-                .pointType(pointHistory.getPointType())
-                .placeId(pointHistory.getPlaceId())
-                .build();
-    }
+
 }
