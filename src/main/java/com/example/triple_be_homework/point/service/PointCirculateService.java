@@ -143,7 +143,16 @@ public class PointCirculateService {
 
         return pointHistoriesTobeSaved;
     }
-
+    @Transactional(readOnly = true)
+    public List<PointHistoryResponseDto> findPointHistory(UUID fromString) {
+        List<PointHistoryResponseDto> pointHistoryResponseDtoList = new ArrayList<>();
+        List<PointHistory> pointHistoryList = pointHistoryRepository.findAllByUserId(fromString);
+        pointHistoryList.forEach(pointHistory -> {
+            PointHistoryResponseDto pointHistoryResponseDto = PointHistoryResponseDto.of(pointHistory);
+            pointHistoryResponseDtoList.add(pointHistoryResponseDto);
+        });
+        return pointHistoryResponseDtoList;
+    }
 
 
 
