@@ -4,12 +4,19 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     show-sql: true
+    hibernate:
+      ddl-auto: update
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/TripleBE?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul
+    username: root
+    password: 1234
   flyway:
     baseline-on-migrate: true
     baseline-version: 0
   kafka:
     consumer:
-      bootstrap-servers: kafka:9092
+      bootstrap-servers: localhost:9092
       group-id: point
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -17,6 +24,6 @@ spring:
       properties:
         spring.json.trusted.packages: "*"
     producer:
-      bootstrap-servers: kafka:9092
+      bootstrap-servers: localhost:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
