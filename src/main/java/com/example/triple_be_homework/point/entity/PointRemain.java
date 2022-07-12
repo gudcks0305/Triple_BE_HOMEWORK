@@ -28,7 +28,7 @@ public class PointRemain extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private PointType pointType;
 
-    @Column(columnDefinition = "BINARY(16)")
+    @Column(columnDefinition = "BINARY(16)" )
     private UUID userId;
 
     @Column(columnDefinition = "BINARY(16)")
