@@ -77,14 +77,15 @@ public class PointHistoryService {
 
         log.info(CAL_POINT_COMPLETE_WHEN_DELETE_REVIEW);
     }
-
-    private List<PointRemain> checkPointRemain(UUID userId, UUID placeId) {
+    @Transactional
+    public List<PointRemain> checkPointRemain(UUID userId, UUID placeId) {
         List<PointRemain> pointRemainList = pointRemainRepository.findAllByUserIdAndPlaceId(userId, placeId);
         if (pointRemainList.isEmpty())
             throw new RuntimeException(userId + "는 " + placeId + "에 리뷰 기록이 없습니다." );
         return pointRemainList;
     }
-     private void saveAllPointHistoryAndRemainList(List<PointHistory> pointHistoryList) {
+    @Transactional
+    public void saveAllPointHistoryAndRemainList(List<PointHistory> pointHistoryList) {
         // point_history 포인트 이력 저장
         List<PointHistory> pointHistoriesSaved
                 = pointHistoryRepository.saveAll(pointHistoryList);
