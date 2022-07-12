@@ -62,11 +62,12 @@ public class PointHistoryService {
                                     .builder().reviewCount(0)
                                     .placeId(placeId)
                                     .build();
+                            // FLUSH 를 하면 error rollback 이 안될 것 같다. -> SAVE 로 하는 것이 좋을 듯
                             placeReviewCountRepository.saveAndFlush(reviewCount);
                             return reviewCount;
                         }
                 );
-                //.orElseThrow(() -> new PlaceReviewCountNotFoundException(placeId));
+                //.orElseThrow(() -> new IllegalArgumentException("해당 Place 없음"));
         // 조건 3. 해당 장소에 대한 첫 리뷰글인 경우 (+1)
         if (placeReviewCount.getReviewCount() == 0)
             pointHistoriesTobeSaved.add(PointHistory.builder()
